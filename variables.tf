@@ -1,6 +1,11 @@
 variable azs {
   type    = list(string)
-  default = ["eu-west-1a", "eu-west-1b"]
+  default = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
+}
+
+variable ecs_office_ip {
+  type    = string
+  default = "212.250.145.34"
 }
 
 variable instance_count {
@@ -20,7 +25,7 @@ variable tags {
 
 variable public_subnets {
   type    = list(string)
-  default = ["10.0.0.0/24", "10.0.1.0/24"]
+  default = ["10.0.0.0/24", "10.0.1.0/24", "10.0.2.0/24"]
 }
 
 variable region {

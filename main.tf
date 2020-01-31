@@ -20,3 +20,25 @@ module web {
 
   tags = var.tags
 }
+
+module "consul_cluster" {
+  source = "github.com/hashicorp/terraform-aws-consul//modules/consul-cluster?ref=v0.7.4"
+
+  ami_id = "ami-02d704b4b23793050"
+
+  # Add this tag to each node in the cluster
+  cluster_tag_key   = "consul-cluster"
+  cluster_tag_value = "consul-cluster-example"
+  cluster_name      = "consul"
+
+  instance_type = "t2.micro"
+
+  vpc_id                      = module.vpc.vpc_id
+  subnet_ids                  = module.vpc.public_subnets
+  allowed_inbound_cidr_blocks = ["${var.ecs_office_ip}/32"]
+
+  user_data = <<-EOF
+    #!/bin/bash
+    /opt/consul/bin/run-consul --server --cluster-tag-key consul-cluster --cluster-tag-value consul-cluster-example
+  EOF
+}
