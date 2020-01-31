@@ -28,16 +28,6 @@ variable region {
   default = "eu-west-1"
 }
 
-variable security_group_alb {
-  type    = string
-  default = "Load Balancer"
-}
-
-variable security_group_web {
-  type    = string
-  default = "Web server"
-}
-
 variable user_data {
   type    = string
   default = <<-EOF

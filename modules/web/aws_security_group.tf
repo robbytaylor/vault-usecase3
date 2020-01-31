@@ -1,7 +1,6 @@
 resource aws_security_group web {
-  name        = var.security_group_web
   description = "Allow inbound traffic from ALB"
-  vpc_id      = module.vpc.vpc_id
+  vpc_id      = var.vpc_id
 }
 
 resource aws_security_group_rule http_ingress {
@@ -25,9 +24,8 @@ resource aws_security_group_rule web_egress {
 }
 
 resource aws_security_group alb {
-  name        = var.security_group_alb
   description = "Allow inbound HTTP and HTTPS traffic"
-  vpc_id      = module.vpc.vpc_id
+  vpc_id      = var.vpc_id
 
   ingress {
     from_port   = 80

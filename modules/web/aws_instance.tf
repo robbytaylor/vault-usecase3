@@ -19,7 +19,7 @@ resource aws_instance web {
 
   ami           = data.aws_ami.ubuntu.id
   instance_type = var.instance_size
-  subnet_id     = module.vpc.public_subnets[0]
+  subnet_id     = var.public_subnets[0]
   user_data     = var.user_data
 
   security_groups = [aws_security_group.web.id]
