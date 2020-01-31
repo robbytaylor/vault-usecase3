@@ -22,7 +22,7 @@ resource aws_instance web {
   subnet_id     = var.public_subnets[0]
   user_data     = var.user_data
 
-  security_groups = [aws_security_group.web.id]
+  vpc_security_group_ids = [aws_security_group.web.id]
 
   tags = var.tags
 }
