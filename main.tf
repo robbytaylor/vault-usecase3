@@ -11,12 +11,30 @@ module vpc {
 }
 
 module web {
-  source = "./modules/web"
+  source = "./modules/instances"
 
   instance_count = var.instance_count
   instance_size  = var.instance_size
   public_subnets = module.vpc.public_subnets
   vpc_id         = module.vpc.vpc_id
+
+  tags = var.tags
+}
+
+module database {
+  source = "./modules/instances"
+
+  instance_count = var.instance_count
+  instance_size  = var.instance_size
+  public_subnets = module.vpc.public_subnets
+  vpc_id         = module.vpc.vpc_id
+
+  user_data = <<-EOF
+    #!/bin/bash
+    apt update
+    apt upgrade
+    apt install -y mysql-server
+EOF
 
   tags = var.tags
 }
