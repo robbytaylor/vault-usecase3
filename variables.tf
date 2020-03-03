@@ -28,7 +28,7 @@ variable consul_ami_id {
 
 variable instance_count {
   type    = number
-  default = 3
+  default = 1
 }
 
 variable instance_size {

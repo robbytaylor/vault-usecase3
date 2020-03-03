@@ -10,28 +10,8 @@ module vpc {
   tags = var.tags
 }
 
-module web {
-  source = "./modules/web"
-
-  instance_count = var.instance_count
-  instance_size  = var.instance_size
-  public_subnets = module.vpc.public_subnets
-  vpc_id         = module.vpc.vpc_id
-  ami_id         = var.consul_ami_id
-
-  allowed_ssh_cidr_blocks = ["${var.ssh_allowed_ip}/32"]
-  ssh_key_name            = var.ssh_key_name
-
-  iam_role_name      = module.consul_cluster.iam_role_id
-  security_group_ids = [module.consul_cluster.security_group_id]
-
-  tags = merge({
-    "${var.cluster_tag_key}" : var.cluster_tag_value
-  }, var.tags)
-}
-
-module database {
-  source = "./modules/database"
+module vault {
+  source = "./modules/vault"
 
   instance_count = var.instance_count
   instance_size  = var.instance_size
@@ -41,7 +21,6 @@ module database {
 
   iam_role_name         = module.consul_cluster.iam_role_id
   security_group_ids    = [module.consul_cluster.security_group_id]
-  web_security_group_id = module.web.security_group_id
 
   allowed_ssh_cidr_blocks = ["${var.ssh_allowed_ip}/32"]
   ssh_key_name            = var.ssh_key_name
