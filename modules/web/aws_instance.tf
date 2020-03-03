@@ -3,7 +3,7 @@ resource aws_instance web {
 
   ami           = var.ami_id
   instance_type = var.instance_size
-  subnet_id     = var.public_subnets[0]
+  subnet_id     = var.public_subnets[count.index % 3]
   key_name      = var.ssh_key_name
 
   user_data = <<-EOF
