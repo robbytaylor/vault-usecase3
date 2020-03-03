@@ -1,11 +1,17 @@
+variable ssh_key_name {
+  type    = string
+  default = "test"
+}
+
 variable azs {
   type    = list(string)
   default = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
 }
 
-variable ecs_office_ip {
+variable ssh_allowed_ip {
   type    = string
-  default = "212.250.145.34"
+  # default = "212.250.145.34"
+  default = "86.169.159.87"
 }
 
 variable instance_count {

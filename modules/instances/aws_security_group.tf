@@ -13,6 +13,16 @@ resource aws_security_group_rule http_ingress {
   security_group_id = aws_security_group.web.id
 }
 
+resource aws_security_group_rule ssh_ingress {
+  type                     = "ingress"
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  cidr_blocks              = var.allowed_ssh_cidr_blocks
+
+  security_group_id = aws_security_group.web.id
+}
+
 resource aws_security_group_rule web_egress {
   type        = "egress"
   from_port   = 0
