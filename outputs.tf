@@ -1,7 +1,15 @@
-output alb_address {
+output web_alb_address {
   value = module.web.alb_address
 }
 
-output instance_ip {
+output web_instance_ip {
   value = module.web.instance_ip
+}
+
+output database_alb_address {
+  value = module.database.alb_address
+}
+
+output database_instance_ip {
+  value = module.database.instance_ip
 }
