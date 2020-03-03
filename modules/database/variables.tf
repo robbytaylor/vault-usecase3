@@ -10,6 +10,10 @@ variable vpc_id {
   type = string
 }
 
+variable web_security_group_id {
+  type = string
+}
+
 variable allowed_ssh_cidr_blocks {
   type    = list(string)
   default = []
@@ -38,9 +42,4 @@ variable ssh_key_name {
 variable tags {
   type    = map
   default = {}
-}
-
-variable user_data {
-  type    = string
-  default = ""
 }
