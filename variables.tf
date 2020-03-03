@@ -1,6 +1,9 @@
+variable ssh_allowed_ip {
+  type = string
+}
+
 variable ssh_key_name {
-  type    = string
-  default = "test"
+  type = string
 }
 
 variable azs {
@@ -8,10 +11,19 @@ variable azs {
   default = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
 }
 
-variable ssh_allowed_ip {
+variable cluster_tag_key {
   type    = string
-  # default = "212.250.145.34"
-  default = "86.169.159.87"
+  default = "consul-cluster"
+}
+
+variable cluster_tag_value {
+  type    = string
+  default = "consul-cluster-example"
+}
+
+variable consul_ami_id {
+  type    = string
+  default = "ami-02d704b4b23793050"
 }
 
 variable instance_count {

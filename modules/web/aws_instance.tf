@@ -1,7 +1,7 @@
 resource aws_instance web {
   count = var.instance_count
 
-  ami           = "ami-02d704b4b23793050"
+  ami           = var.ami_id
   instance_type = var.instance_size
   subnet_id     = var.public_subnets[0]
   key_name      = var.ssh_key_name
