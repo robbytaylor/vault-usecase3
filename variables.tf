@@ -51,16 +51,6 @@ variable region {
   default = "eu-west-1"
 }
 
-variable user_data {
-  type    = string
-  default = <<-EOF
-    #!/bin/bash
-    apt update
-    apt upgrade
-    apt install -y apache2
-EOF
-}
-
 variable vpc_cidr {
   type    = string
   default = "10.0.0.0/16"
@@ -68,5 +58,30 @@ variable vpc_cidr {
 
 variable vpc_name {
   type    = string
-  default = "TerraformUseCaseVpc"
+  default = "VaultUseCaseVpc"
+}
+
+variable secondary_azs {
+  type    = list(string)
+  default = ["eu-west-2a", "eu-west-2b", "eu-west-2c"]
+}
+
+variable secondary_region {
+  type    = string
+  default = "eu-west-2"
+}
+
+variable secondary_vpc_cidr {
+  type    = string
+  default = "10.1.0.0/16"
+}
+
+variable secondary_public_subnets {
+  type    = list(string)
+  default = ["10.1.0.0/24", "10.1.1.0/24", "10.1.2.0/24"]
+}
+
+variable secondary_vpc_name {
+  type    = string
+  default = "VaultUseCaseVpc"
 }
