@@ -19,11 +19,12 @@ module vault {
   vpc_id         = module.vpc.vpc_id
   ami_id         = var.consul_ami_id
 
-  iam_role_name         = module.consul_cluster.iam_role_id
-  security_group_ids    = [module.consul_cluster.security_group_id]
+  security_group_ids = [module.consul_cluster.security_group_id]
 
   allowed_ssh_cidr_blocks = ["${var.ssh_allowed_ip}/32"]
   ssh_key_name            = var.ssh_key_name
+
+  region = var.region
 
   tags = merge({
     "${var.cluster_tag_key}" : var.cluster_tag_value

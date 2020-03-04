@@ -41,6 +41,11 @@ resource aws_launch_template vault {
         address     = "127.0.0.1:8200"
         tls_disable = 1
       }
+
+      seal "awskms" {
+        region = "${var.region}"
+        kms_key_id = "${aws_kms_key.vault.id}"
+      }
     ' > /etc/vault/config.hcl
 
     echo '{"service":
@@ -76,5 +81,7 @@ EOF
 }
 
 resource aws_iam_instance_profile instance_profile {
-  role = var.iam_role_name
+  role = aws_iam_role.vault.name
 }
+
+resource aws_kms_key vault {}

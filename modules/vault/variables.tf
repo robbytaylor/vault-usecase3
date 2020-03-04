@@ -2,12 +2,12 @@ variable ami_id {
   type = string
 }
 
-variable iam_role_name {
-  type    = string
-}
-
 variable public_subnets {
   type = list(string)
+}
+
+variable region {
+  type = string
 }
 
 variable vpc_id {
