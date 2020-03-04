@@ -54,3 +54,26 @@ data aws_iam_policy_document auto_discover_cluster {
     resources = ["*"]
   }
 }
+
+resource aws_iam_role_policy cloudwatch_logs {
+  name   = "write-to-cloudwatch-logs"
+  role   = aws_iam_role.vault.id
+  policy = data.aws_iam_policy_document.cloudwatch_logs.json
+}
+
+data aws_iam_policy_document cloudwatch_logs {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "logs:CreateLogStream",
+      "logs:DescribeLogStreams",
+      "logs:PutLogEvents"
+    ]
+
+    resources = [
+      "arn:aws:logs:${var.region}:${local.account_id}:log-group:${var.cloudwatch_log_group}",
+      "arn:aws:logs:${var.region}:${local.account_id}:log-group:${var.cloudwatch_log_group}:*:*"
+    ]
+  }
+}

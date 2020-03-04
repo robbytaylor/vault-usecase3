@@ -21,9 +21,30 @@ resource aws_launch_template vault {
     apt-get update
     apt-get install -y unzip wget
 
+    cd /tmp
+
+    wget https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
+    dpkg -i /tmp/amazon-cloudwatch-agent.deb
+
+    echo '
+      {
+        "logs": {
+          "logs_collected": {
+            "files": {
+              "collect_list": [
+                {
+                  "file_path": "/var/log/vault_audit.log",
+                  "log_group_name": "${var.cloudwatch_log_group}"
+                }
+              ]
+            }
+          }
+        }
+      }
+    ' > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+
     /opt/consul/bin/run-consul --client --cluster-tag-key consul-cluster --cluster-tag-value consul-cluster-example
 
-    cd /tmp
     wget https://releases.hashicorp.com/vault/1.3.2/vault_1.3.2_linux_amd64.zip
     unzip vault_1.3.2_linux_amd64.zip
 
@@ -66,6 +87,7 @@ resource aws_launch_template vault {
 
     consul reload
     /usr/local/bin/vault server -config /etc/vault/config.hcl
+    vault audit enable file file_path=/var/log/vault_audit.log
 EOF
 )
 

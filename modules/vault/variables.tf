@@ -1,3 +1,7 @@
+locals {
+  account_id = data.aws_caller_identity.current.account_id
+}
+
 variable ami_id {
   type = string
 }
@@ -17,6 +21,11 @@ variable vpc_id {
 variable allowed_ssh_cidr_blocks {
   type    = list(string)
   default = []
+}
+
+variable cloudwatch_log_group {
+  type    = string
+  default = "vaul"
 }
 
 variable instance_count {
