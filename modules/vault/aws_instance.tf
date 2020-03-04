@@ -1,12 +1,22 @@
-resource aws_instance vault {
-  count = var.instance_count
+resource aws_autoscaling_group vault {
+  launch_template {
+    id      = aws_launch_template.vault.id
+    version = "$Latest"
+  }
 
-  ami           = var.ami_id
+  min_size         = var.instance_count
+  max_size         = var.instance_count
+  desired_capacity = var.instance_count
+
+  vpc_zone_identifier = var.public_subnets
+}
+
+resource aws_launch_template vault {
+  image_id      = var.ami_id
   instance_type = var.instance_size
-  subnet_id     = var.public_subnets[0]
   key_name      = var.ssh_key_name
 
-  user_data = <<-EOF
+  user_data = base64encode(<<-EOF
     #!/bin/bash
     apt-get update
     apt-get install -y unzip wget
@@ -52,10 +62,17 @@ resource aws_instance vault {
     consul reload
     /usr/local/bin/vault server -config /etc/vault/config.hcl
 EOF
+)
 
-  iam_instance_profile   = aws_iam_instance_profile.instance_profile.name
-  vpc_security_group_ids = concat([aws_security_group.vault.id], var.security_group_ids)
-  tags                   = var.tags
+  iam_instance_profile {
+    name = aws_iam_instance_profile.instance_profile.name
+  }
+
+  network_interfaces {
+    security_groups = concat([aws_security_group.vault.id], var.security_group_ids)
+  }
+
+  tags = var.tags
 }
 
 resource aws_iam_instance_profile instance_profile {
