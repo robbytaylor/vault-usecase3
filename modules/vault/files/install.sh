@@ -9,21 +9,23 @@ dpkg -i /tmp/amazon-cloudwatch-agent.deb
 
 echo '
     {
-    "logs": {
-        "logs_collected": {
-        "files": {
-            "collect_list": [
-            {
-                "file_path": "/var/log/vault_audit.log",
-                "log_group_name": "${cloudwatch_log_group}"
+        "logs": {
+            "logs_collected": {
+                "files": {
+                    "collect_list": [
+                        {
+                            "file_path": "/var/log/vault_audit.log",
+                            "log_group_name": "${cloudwatch_log_group}",
+                            "log_stream_name": "{instance_id}"
+                        }
+                    ]
+                }
             }
-            ]
         }
-        }
-    }
     }
 ' > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
 
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s
 /opt/consul/bin/run-consul --client --cluster-tag-key consul-cluster --cluster-tag-value consul-cluster-example
 
 wget https://releases.hashicorp.com/vault/1.3.2/vault_1.3.2_linux_amd64.zip
