@@ -25,7 +25,7 @@ variable allowed_ssh_cidr_blocks {
 
 variable cloudwatch_log_group {
   type    = string
-  default = "vaul"
+  default = "vault"
 }
 
 variable instance_count {
