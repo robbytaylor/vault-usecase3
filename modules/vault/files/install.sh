@@ -69,6 +69,48 @@ echo '{
     }
 }' > /opt/consul/config/vault.json
 
+useradd --system vault
+
+echo '
+[Service]
+User=vault
+Group=vault
+ProtectSystem=full
+ProtectHome=read-only
+PrivateTmp=yes
+PrivateDevices=yes
+SecureBits=keep-caps
+AmbientCapabilities=CAP_IPC_LOCK
+Capabilities=CAP_IPC_LOCK+ep
+CapabilityBoundingSet=CAP_SYSLOG CAP_IPC_LOCK
+NoNewPrivileges=yes
+ExecStart=/usr/local/bin/vault server -config /etc/vault/config.hcl
+ExecReload=/bin/kill --signal HUP \$MAINPID
+KillMode=process
+KillSignal=SIGINT
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+StartLimitIntervalSec=60
+StartLimitBurst=3
+LimitNOFILE=65536
+' > /etc/systemd/system/vault.service
+
 consul reload
-/usr/local/bin/vault server -config /etc/vault/config.hcl
+service vault start
+
+sleep 5
+
+export VAULT_ADDR=http://127.0.0.1:8200
+
 vault audit enable file file_path=/var/log/vault_audit.log
+
+if [[ $(vault status -format json | jq -r .initialized) == "false" ]]
+then
+    apt install -y python3-pip
+    pip3 install awscli --upgrade --user
+
+    key=$(vault operator init -recovery-shares=1 -recovery-threshold=1 -format json | jq -r .recovery_keys_b64)
+
+    aws ssm put-parameter --name VaultRecoveryKey --value "$key" --type String --region ${region}
+fi

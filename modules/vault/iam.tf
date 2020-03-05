@@ -10,7 +10,7 @@ data aws_iam_policy_document assume-role {
   }
 }
 
-data aws_iam_policy_document vault-kms-unseal {
+data aws_iam_policy_document vault {
   statement {
     sid       = "VaultKMSUnseal"
     effect    = "Allow"
@@ -22,6 +22,16 @@ data aws_iam_policy_document vault-kms-unseal {
       "kms:DescribeKey",
     ]
   }
+
+  statement {
+    sid       = "PutRecoveryShare"
+    effect    = "Allow"
+    resources = ["arn:aws:ssm:${var.region}:${local.account_id}:parameter/VaultRecoveryKey"]
+
+    actions = [
+      "ssm:PutParameter"
+    ]
+  }
 }
 
 resource aws_iam_role vault {
@@ -29,10 +39,10 @@ resource aws_iam_role vault {
   assume_role_policy = data.aws_iam_policy_document.assume-role.json
 }
 
-resource aws_iam_role_policy vault-kms-unseal {
-  name   = "Vault-KMS-Unseal"
+resource aws_iam_role_policy vault {
+  name   = "Vault"
   role   = aws_iam_role.vault.id
-  policy = data.aws_iam_policy_document.vault-kms-unseal.json
+  policy = data.aws_iam_policy_document.vault.json
 }
 
 resource aws_iam_role_policy auto_discover_cluster {
