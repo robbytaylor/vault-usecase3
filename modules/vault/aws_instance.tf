@@ -16,80 +16,11 @@ resource aws_launch_template vault {
   instance_type = var.instance_size
   key_name      = var.ssh_key_name
 
-  user_data = base64encode(<<-EOF
-    #!/bin/bash
-    apt-get update
-    apt-get install -y unzip wget
-
-    cd /tmp
-
-    wget https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
-    dpkg -i /tmp/amazon-cloudwatch-agent.deb
-
-    echo '
-      {
-        "logs": {
-          "logs_collected": {
-            "files": {
-              "collect_list": [
-                {
-                  "file_path": "/var/log/vault_audit.log",
-                  "log_group_name": "${var.cloudwatch_log_group}"
-                }
-              ]
-            }
-          }
-        }
-      }
-    ' > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
-
-    /opt/consul/bin/run-consul --client --cluster-tag-key consul-cluster --cluster-tag-value consul-cluster-example
-
-    wget https://releases.hashicorp.com/vault/1.3.2/vault_1.3.2_linux_amd64.zip
-    unzip vault_1.3.2_linux_amd64.zip
-
-    mv /tmp/vault /usr/local/bin/
-
-    mkdir /etc/vault/
-
-    echo '
-      storage "consul" {
-        address = "127.0.0.1:8500"
-        path    = "vault"
-      }
-
-      listener "tcp" {
-        address     = "127.0.0.1:8200"
-        tls_disable = 1
-      }
-
-      seal "awskms" {
-        region = "${var.region}"
-        kms_key_id = "${aws_kms_key.vault.id}"
-      }
-    ' > /etc/vault/config.hcl
-
-    echo '{"service":
-      {"name": "vault",
-      "tags": ["vault"],
-      "port": 8200,
-      "check": {
-        "id": "vault_check",
-        "name": "Check vault health",
-        "service_id": "vault",
-        "http": "http://localhost:8200/",
-        "method": "GET",
-        "interval": "10s",
-        "timeout": "1s"
-      }}
-      }
-    }' > /opt/consul/config/vault.json
-
-    consul reload
-    /usr/local/bin/vault server -config /etc/vault/config.hcl
-    vault audit enable file file_path=/var/log/vault_audit.log
-EOF
-)
+  user_data = base64encode(templatefile("${path.module}/files/install.sh", {
+    cloudwatch_log_group = var.cloudwatch_log_group,
+    kms_key_id           = aws_kms_key.vault.id,
+    region               = var.region
+  }))
 
   iam_instance_profile {
     name = aws_iam_instance_profile.instance_profile.name
