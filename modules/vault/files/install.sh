@@ -69,7 +69,11 @@ echo '{
     }
 }' > /opt/consul/config/vault.json
 
+consul reload
+
 useradd --system vault
+touch /var/log/vault_audit.log
+chown vault:vault /var/log/vault_audit.log
 
 echo '
 [Service]
@@ -96,21 +100,54 @@ StartLimitBurst=3
 LimitNOFILE=65536
 ' > /etc/systemd/system/vault.service
 
-consul reload
 service vault start
 
-sleep 5
+sleep 30
 
 export VAULT_ADDR=http://127.0.0.1:8200
-
-vault audit enable file file_path=/var/log/vault_audit.log
 
 if [[ $(vault status -format json | jq -r .initialized) == "false" ]]
 then
     apt install -y python3-pip
     pip3 install awscli --upgrade --user
 
-    key=$(vault operator init -recovery-shares=1 -recovery-threshold=1 -format json | jq -r .recovery_keys_b64)
+    output=$(vault operator init -recovery-shares=1 -recovery-threshold=1 -format json)
 
-    aws ssm put-parameter --name VaultRecoveryKey --value "$key" --type String --region ${region}
+    key=$(echo $output | jq -r .recovery_keys_b64)
+    token=$(echo $output | jq -r .root_token)
+
+    aws ssm put-parameter --name VaultRecoveryKey --value "$key" --type String --region ${region} --overwrite
+
+    vault login $token
+
+    vault audit enable file file_path=/var/log/vault_audit.log
+
+    vault secrets enable pki
+    vault secrets tune -max-lease-ttl=87600h pki
+
+    vault write -field=certificate pki/root/generate/internal \
+        common_name="example.com" \
+        ttl=87600h > CA_cert.crt
+
+    vault write pki/config/urls \
+        issuing_certificates="http://127.0.0.1:8200/v1/pki/ca" \
+        crl_distribution_points="http://127.0.0.1:8200/v1/pki/crl"
+
+    vault secrets enable -path=pki_int pki
+    vault secrets tune -max-lease-ttl=43800h pki_int
+
+    vault write -format=json pki_int/intermediate/generate/internal \
+        common_name="example.com Intermediate Authority" \
+        | jq -r '.data.csr' > pki_intermediate.csr
+
+    vault write -format=json pki/root/sign-intermediate csr=@pki_intermediate.csr \
+        format=pem_bundle ttl="43800h" \
+        | jq -r '.data.certificate' > intermediate.cert.pem
+
+    vault write pki_int/intermediate/set-signed certificate=@intermediate.cert.pem
+
+    vault write pki_int/roles/example-dot-com \
+        allowed_domains="example.com" \
+        allow_subdomains=true \
+        max_ttl="720h"
 fi
