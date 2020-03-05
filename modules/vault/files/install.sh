@@ -35,34 +35,35 @@ mkdir /etc/vault/
 
 echo '
     storage "consul" {
-    address = "127.0.0.1:8500"
-    path    = "vault"
+        address = "127.0.0.1:8500"
+        path    = "vault"
     }
 
     listener "tcp" {
-    address     = "127.0.0.1:8200"
-    tls_disable = 1
+        address     = "127.0.0.1:8200"
+        tls_disable = 1
     }
 
     seal "awskms" {
-    region = "${region}"
-    kms_key_id = "${kms_key_id}"
+        region = "${region}"
+        kms_key_id = "${kms_key_id}"
     }
 ' > /etc/vault/config.hcl
 
-echo '{"service":
-    {"name": "vault",
-    "tags": ["vault"],
-    "port": 8200,
-    "check": {
-    "id": "vault_check",
-    "name": "Check vault health",
-    "service_id": "vault",
-    "http": "http://localhost:8200/",
-    "method": "GET",
-    "interval": "10s",
-    "timeout": "1s"
-    }}
+echo '{
+    "service": {
+        "name": "vault",
+        "tags": ["vault"],
+        "port": 8200,
+        "check": {
+            "id": "vault_check",
+            "name": "Check vault health",
+            "service_id": "vault",
+            "http": "http://localhost:8200/",
+            "method": "GET",
+            "interval": "10s",
+            "timeout": "1s"
+        }
     }
 }' > /opt/consul/config/vault.json
 
