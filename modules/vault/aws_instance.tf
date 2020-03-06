@@ -22,7 +22,10 @@ resource aws_launch_template vault {
     kms_key_id           = aws_kms_key.vault.id,
     region               = var.region
 
-    install_vault_ca = file("${path.module}/files/vault_ca.sh")
+    install_vault_ca               = file("${path.module}/files/vault_ca.sh")
+    install_vault_ssh_certificates = templatefile("${path.module}/files/vault_ssh_certificates.sh", {
+      region = var.region
+    })
   }))
 
   iam_instance_profile {

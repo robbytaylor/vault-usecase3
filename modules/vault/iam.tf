@@ -27,7 +27,8 @@ data aws_iam_policy_document vault {
     sid       = "PutRecoveryShare"
     effect    = "Allow"
     resources = [
-      "arn:aws:ssm:${var.region}:${local.account_id}:parameter/VaultRecoveryKey"
+      "arn:aws:ssm:${var.region}:${local.account_id}:parameter/VaultRecoveryKey",
+      "arn:aws:ssm:${var.region}:${local.account_id}:parameter/VaultSSHPublicKey"
     ]
 
     actions = [

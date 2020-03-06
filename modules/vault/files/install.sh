@@ -123,4 +123,5 @@ then
     vault audit enable file file_path=/var/log/vault_audit.log
 
     ${install_vault_ca}
+    ${install_vault_ssh_certificates}
 fi
