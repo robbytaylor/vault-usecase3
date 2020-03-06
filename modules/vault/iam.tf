@@ -26,7 +26,10 @@ data aws_iam_policy_document vault {
   statement {
     sid       = "PutRecoveryShare"
     effect    = "Allow"
-    resources = ["arn:aws:ssm:${var.region}:${local.account_id}:parameter/VaultRecoveryKey"]
+    resources = [
+      "arn:aws:ssm:${var.region}:${local.account_id}:parameter/VaultRecoveryKey",
+      "arn:aws:ssm:${var.region}:${local.account_id}:parameter/VaultRootToken"
+    ]
 
     actions = [
       "ssm:PutParameter"
