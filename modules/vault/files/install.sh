@@ -111,12 +111,13 @@ then
     apt install -y python3-pip
     pip3 install awscli --upgrade --user
 
-    output=$(vault operator init -recovery-shares=1 -recovery-threshold=1 -format json -recovery-pgp-keys="keybase:${keybase_username}")
+    output=$(vault operator init -recovery-shares=1 -recovery-threshold=1 -format json -recovery-pgp-keys="keybase:${keybase_username}" -root-token-pgp-key="keybase:${keybase_username}")
 
     key=$(echo $output | jq -r .recovery_keys_b64)
     token=$(echo $output | jq -r .root_token)
 
     aws ssm put-parameter --name VaultRecoveryKey --value "$key" --type String --region ${region} --overwrite
+    aws ssm put-parameter --name VaultRootToken --value "$token" --type String --region ${region} --overwrite
 
     vault login $token
 
