@@ -6,6 +6,10 @@ variable ami_id {
   type = string
 }
 
+variable keybase_username {
+  type = string
+}
+
 variable public_subnets {
   type = list(string)
 }

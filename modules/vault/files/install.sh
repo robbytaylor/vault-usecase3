@@ -111,7 +111,7 @@ then
     apt install -y python3-pip
     pip3 install awscli --upgrade --user
 
-    output=$(vault operator init -recovery-shares=1 -recovery-threshold=1 -format json)
+    output=$(vault operator init -recovery-shares=1 -recovery-threshold=1 -format json -recovery-pgp-keys="keybase:${keybase_username}")
 
     key=$(echo $output | jq -r .recovery_keys_b64)
     token=$(echo $output | jq -r .root_token)

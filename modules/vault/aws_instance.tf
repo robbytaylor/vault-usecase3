@@ -18,6 +18,7 @@ resource aws_launch_template vault {
 
   user_data = base64encode(templatefile("${path.module}/files/install.sh", {
     cloudwatch_log_group = var.cloudwatch_log_group,
+    keybase_username     = var.keybase_username,
     kms_key_id           = aws_kms_key.vault.id,
     region               = var.region
   }))

@@ -13,11 +13,12 @@ module vpc {
 module vault {
   source = "./modules/vault"
 
-  instance_count = var.instance_count
-  instance_size  = var.instance_size
-  public_subnets = module.vpc.public_subnets
-  vpc_id         = module.vpc.vpc_id
-  ami_id         = var.consul_ami_id
+  instance_count   = var.instance_count
+  instance_size    = var.instance_size
+  public_subnets   = module.vpc.public_subnets
+  vpc_id           = module.vpc.vpc_id
+  ami_id           = var.consul_ami_id
+  keybase_username = var.keybase_username
 
   security_group_ids = [module.consul_cluster.security_group_id]
 

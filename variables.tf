@@ -1,3 +1,7 @@
+variable keybase_username {
+  type = string
+}
+
 variable ssh_allowed_ip {
   type = string
 }
