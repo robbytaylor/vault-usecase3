@@ -21,6 +21,8 @@ resource aws_launch_template vault {
     keybase_username     = var.keybase_username,
     kms_key_id           = aws_kms_key.vault.id,
     region               = var.region
+
+    install_vault_ca = file("${path.module}/files/vault_ca.sh")
   }))
 
   iam_instance_profile {
